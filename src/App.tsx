@@ -1,5 +1,7 @@
 import Search from "./components/Search"
 import { useState, useEffect } from 'react';
+import Spinner from "./components/Spinner";
+import MovieCard from "./components/MovieCard";
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_OPTIONS = {
@@ -10,9 +12,12 @@ const API_OPTIONS = {
   }
 }
 type Movie = {
-  id : number,
+  id: number,
   title: string;
-  // add other properties as needed
+  vote_average : number;
+  poster_path : string;
+  release_date : string;
+  original_language : string
 };
 
 const App = () => {
@@ -32,8 +37,8 @@ const App = () => {
       }
       const data = await response.json();
       if (data.Response === "False") {
-        throw new Error("Failed to fetch Movies Data")
         setMovieList([]);
+        throw new Error("Failed to fetch Movies Data")
       }
       console.log(data)
       setMovieList(data.results || [])
@@ -60,15 +65,15 @@ const App = () => {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
         <section className="all-movies">
-          <h2>All Movies</h2>
-          {isLoading ? (<p className="text-white">Loading...</p>) :
+          <h2 className="mt-[40px]">All Movies</h2>
+          {isLoading ? (<Spinner />) :
             errorMsg ? (<p className="text-red-500">{errorMsg}</p>) :
               (
-              <ul>
-                {movieList.map((movie) => (
-                  <p key={movie.id} className="text-white">{movie.title}</p>
-                ))}
-              </ul>
+                <ul>
+                  {movieList.map((movie) => (
+                    <MovieCard key={movie.id} movie={movie} />
+                  ))}
+                </ul>
               )
           };
         </section>
